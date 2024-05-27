@@ -1,0 +1,8 @@
+POST http://localhost:8000/posts/
+Content-Type: application/json
+
+{
+  "title": "My New Post",
+  "username":"user",
+  "content": "This is the content of my new post."
+}

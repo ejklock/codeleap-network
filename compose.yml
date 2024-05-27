@@ -1,0 +1,48 @@
+version: '3.7'
+services:
+  app:
+    container_name: codeleap-network-app-dev
+    entrypoint: wait-for db:3306 -t 40 -- python manage.py runserver 0.0.0.0:8000
+    depends_on:
+      - db
+    environment:
+    - COMPOSER_MEMORY_LIMIT=-1
+    build: .
+    env_file:
+      - .env
+    networks:
+    - codeleap-networkNetwork
+    restart: unless-stopped
+    ports:
+      - 8000:8000
+    volumes:
+    - ./:/var/www/app
+    working_dir: /var/www/app
+  db:
+    command: --default-authentication-plugin=mysql_native_password
+    container_name: codeleap-network-dev-db
+    environment:
+      MYSQL_DATABASE: codeleap-network
+      MYSQL_PASSWORD: codeleap-network
+      MYSQL_ROOT_PASSWORD: codeleap-network
+      MYSQL_USER: codeleap-network
+      SERVICE_NAME: mysql
+      SERVICE_TAGS: dev
+    image: mysql:8.1
+    networks:
+    - codeleap-networkNetwork
+    ports: 
+      - 33306:3306
+    restart: unless-stopped
+    tty: true
+    volumes:
+    - ./docker-compose/mysql:/docker-entrypoint-initdb.d
+    - codeleap-networkMysqlData:/var/lib/mysql
+
+networks:
+  codeleap-networkNetwork:
+    driver: bridge
+volumes:
+  codeleap-networkMysqlData:
+    driver: local
+    name: codeleap-networkMysqlData
